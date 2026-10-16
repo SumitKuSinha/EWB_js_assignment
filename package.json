@@ -1,0 +1,28 @@
+{
+  "name": "js-assignment-sumit",
+  "version": "1.0.0",
+  "description": "Complete, custom JavaScript curriculum and capstone repository featuring modular tasks and an interactive slate & teal browser runner.",
+  "main": "test_runner.js",
+  "scripts": {
+    "test": "node test_runner.js",
+    "start": "node test_runner.js",
+    "task:1": "node task_01_types.js",
+    "task:2": "node task_02_billing.js",
+    "task:3": "node task_03_evaluator.js",
+    "task:4": "node task_04_iterations.js",
+    "task:5": "node task_05_functions.js",
+    "task:6": "node task_06_collections.js",
+    "task:7": "node task_07_inventory_app.js",
+    "all": "node test_runner.js"
+  },
+  "keywords": [
+    "javascript",
+    "curriculum",
+    "capstone",
+    "modular",
+    "dark-mode",
+    "interactive-dashboard"
+  ],
+  "author": "Sumit",
+  "license": "MIT"
+}

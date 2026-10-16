@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Assignment Studio - Slate & Teal Runner</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#172033',
+                            900: '#0f172a',
+                            950: '#090d16'
+                        },
+                        teal: {
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <!-- Custom CSS Fallback & Fine Aesthetic Polishing -->
+    <style>
+        :root {
+            --bg-canvas: #0f172a;
+            --accent-teal: #14b8a6;
+            --border-slate: #334155;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+        }
+        /* Custom Glowing Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #14b8a6;
+        }
+        .teal-glow {
+            box-shadow: 0 0 25px -5px rgba(20, 184, 166, 0.25);
+        }
+        .teal-glow-hover:hover {
+            box-shadow: 0 0 30px -3px rgba(20, 184, 166, 0.35);
+            border-color: #14b8a6;
+        }
+        .terminal-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #334155 #0b1120;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 flex flex-col min-h-screen">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+            <!-- Brand / Title -->
+            <div class="flex items-center space-x-3.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-teal-500/20 text-lg">
+                    JS
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-lg font-bold text-slate-50 tracking-tight">JavaScript Assignment Runner</h1>
+                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30">
+                            v2.0 Clean Architecture
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400">Curriculum-Strict &bull; Modular Script Architecture &bull; Interactive Consoles</p>
+                </div>
+            </div>
+
+            <!-- Global Action Bar -->
+            <div class="flex items-center flex-wrap gap-2.5">
+                <button id="btn-run-all" onclick="executeAllTasks()" class="px-3.5 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 font-semibold text-xs tracking-wide transition-all shadow-md shadow-teal-500/25 flex items-center space-x-1.5 active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Run All Modules</span>
+                </button>
+                <button onclick="clearAllConsoles()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs border border-slate-700 transition flex items-center space-x-1.5">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span>Clear All</span>
+                </button>
+                <button onclick="exportLogsToFile()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs border border-slate-700 transition flex items-center space-x-1.5">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Export Logs</span>
+                </button>
+                <button onclick="copyMasterLogs()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs border border-slate-700 transition flex items-center space-x-1.5">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    <span>Copy All</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Status Overview Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 font-bold">7</div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Modular Tasks</div>
+                    <div class="text-sm font-semibold text-slate-100">task_01 to task_07</div>
+                </div>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold">#0f</div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Palette Theme</div>
+                    <div class="text-sm font-semibold text-slate-100">Slate & Teal Dark</div>
+                </div>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">100%</div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Spec Adherence</div>
+                    <div class="text-sm font-semibold text-slate-100">Strict Curriculum</div>
+                </div>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-center space-x-3">
+                <div id="stat-run-count" class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">0</div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Total Executions</div>
+                    <div id="stat-run-label" class="text-sm font-semibold text-slate-100">0 tasks run</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Cards Grid (Tasks 1 through 6) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Card 01: Types & Declarations -->
+            <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 teal-glow-hover">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-500/15 text-teal-400 border border-teal-500/30">TASK 01</span>
+                            <h2 class="text-base font-bold text-slate-100">Data Types & Declarations</h2>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">task_01_types.js</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        Evaluates primitive & reference types using <code class="text-teal-300">var</code>, <code class="text-teal-300">let</code>, and <code class="text-teal-300">const</code>, outputting formatted type reflections via <code class="text-teal-300">typeof</code>.
+                    </p>
+                    <div class="flex flex-wrap gap-1.5 mb-4 text-[11px] font-mono">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">candidateName (var)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">candidateAge (let)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">hasActiveJob (const)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">techStack (Array)</span>
+                    </div>
+                </div>
+
+                <!-- Card Terminal -->
+                <div>
+                    <div class="flex items-center justify-between bg-slate-950/80 px-3.5 py-2 rounded-t-xl border border-b-0 border-slate-800 text-xs">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <span class="ml-2 font-mono text-[11px] text-slate-400">console // task_01</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="status-task-1" class="text-[10px] font-mono text-slate-500 uppercase">IDLE</span>
+                            <button onclick="clearConsole(1)" class="text-[10px] text-slate-400 hover:text-teal-400">Clear</button>
+                        </div>
+                    </div>
+                    <pre id="console-1" class="bg-slate-950 text-slate-300 font-mono text-xs p-3.5 rounded-b-xl border border-slate-800 h-36 overflow-y-auto terminal-scroll leading-5">Console waiting for execution...</pre>
+
+                    <!-- Execution Buttons -->
+                    <div class="mt-3.5 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="executeTask(1)" class="px-3.5 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-semibold shadow transition active:scale-95 flex items-center space-x-1.5">
+                                <span>🚀 Execute Script</span>
+                            </button>
+                            <button onclick="viewTaskCode(1)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                View Code
+                            </button>
+                        </div>
+                        <button onclick="copyConsole(1)" class="text-xs text-slate-400 hover:text-teal-400">Copy Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 02: Billing & Gratuity -->
+            <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 teal-glow-hover">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-500/15 text-teal-400 border border-teal-500/30">TASK 02</span>
+                            <h2 class="text-base font-bold text-slate-100">Billing & Gratuity Casting</h2>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">task_02_billing.js</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        Converts raw strings via explicit <code class="text-teal-300">Number()</code> casting, prompts for dynamic bill & gratuity rate, and computes total payable.
+                    </p>
+                    <div class="flex flex-wrap gap-1.5 mb-4 text-[11px] font-mono">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">rawBillAmount</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">rawGratuityRate</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-teal-300 border border-slate-700">Number() Casting</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-emerald-300 border border-slate-700">Browser Prompts</span>
+                    </div>
+                </div>
+
+                <!-- Card Terminal -->
+                <div>
+                    <div class="flex items-center justify-between bg-slate-950/80 px-3.5 py-2 rounded-t-xl border border-b-0 border-slate-800 text-xs">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <span class="ml-2 font-mono text-[11px] text-slate-400">console // task_02</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="status-task-2" class="text-[10px] font-mono text-slate-500 uppercase">IDLE</span>
+                            <button onclick="clearConsole(2)" class="text-[10px] text-slate-400 hover:text-teal-400">Clear</button>
+                        </div>
+                    </div>
+                    <pre id="console-2" class="bg-slate-950 text-slate-300 font-mono text-xs p-3.5 rounded-b-xl border border-slate-800 h-36 overflow-y-auto terminal-scroll leading-5">Console waiting for execution...</pre>
+
+                    <!-- Execution Buttons -->
+                    <div class="mt-3.5 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="executeTaskWithPrompt(2)" class="px-3.5 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-semibold shadow transition active:scale-95 flex items-center space-x-1.5">
+                                <span>💬 Prompt & Run</span>
+                            </button>
+                            <button onclick="executeTask(2)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                Default ($100 / 15%)
+                            </button>
+                            <button onclick="viewTaskCode(2)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                View Code
+                            </button>
+                        </div>
+                        <button onclick="copyConsole(2)" class="text-xs text-slate-400 hover:text-teal-400">Copy Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 03: Score & Grade Evaluator -->
+            <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 teal-glow-hover">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-500/15 text-teal-400 border border-teal-500/30">TASK 03</span>
+                            <h2 class="text-base font-bold text-slate-100">Score & Grade Evaluator</h2>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">task_03_evaluator.js</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        Combines <code class="text-teal-300">if...else</code> score bracket analysis, <code class="text-teal-300">switch</code> case grade mapping, and a <code class="text-teal-300">ternary operator</code> for pass/fail classification.
+                    </p>
+                    <div class="flex flex-wrap gap-1.5 mb-4 text-[11px] font-mono">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">studentScore (85)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">computedGrade</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">outcomeStatus</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-amber-300 border border-slate-700">Ternary >= 60</span>
+                    </div>
+                </div>
+
+                <!-- Card Terminal -->
+                <div>
+                    <div class="flex items-center justify-between bg-slate-950/80 px-3.5 py-2 rounded-t-xl border border-b-0 border-slate-800 text-xs">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <span class="ml-2 font-mono text-[11px] text-slate-400">console // task_03</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="status-task-3" class="text-[10px] font-mono text-slate-500 uppercase">IDLE</span>
+                            <button onclick="clearConsole(3)" class="text-[10px] text-slate-400 hover:text-teal-400">Clear</button>
+                        </div>
+                    </div>
+                    <pre id="console-3" class="bg-slate-950 text-slate-300 font-mono text-xs p-3.5 rounded-b-xl border border-slate-800 h-36 overflow-y-auto terminal-scroll leading-5">Console waiting for execution...</pre>
+
+                    <!-- Execution Buttons -->
+                    <div class="mt-3.5 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="executeTaskWithPrompt(3)" class="px-3.5 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-semibold shadow transition active:scale-95 flex items-center space-x-1.5">
+                                <span>💬 Prompt & Run</span>
+                            </button>
+                            <button onclick="executeTask(3)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                Default (85)
+                            </button>
+                            <button onclick="viewTaskCode(3)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                View Code
+                            </button>
+                        </div>
+                        <button onclick="copyConsole(3)" class="text-xs text-slate-400 hover:text-teal-400">Copy Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 04: Iterations & Loops -->
+            <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 teal-glow-hover">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-500/15 text-teal-400 border border-teal-500/30">TASK 04</span>
+                            <h2 class="text-base font-bold text-slate-100">Iterations & Jump Controls</h2>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">task_04_iterations.js</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        Features a <code class="text-teal-300">for</code> table loop, a <code class="text-teal-300">while</code> loop with <code class="text-teal-300">break</code> searching for &gt; 10 divisible by 6, and a <code class="text-teal-300">do...while</code> loop with <code class="text-teal-300">continue</code>.
+                    </p>
+                    <div class="flex flex-wrap gap-1.5 mb-4 text-[11px] font-mono">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">for loop (table of 5)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">while (break)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">do...while (continue)</span>
+                    </div>
+                </div>
+
+                <!-- Card Terminal -->
+                <div>
+                    <div class="flex items-center justify-between bg-slate-950/80 px-3.5 py-2 rounded-t-xl border border-b-0 border-slate-800 text-xs">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <span class="ml-2 font-mono text-[11px] text-slate-400">console // task_04</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="status-task-4" class="text-[10px] font-mono text-slate-500 uppercase">IDLE</span>
+                            <button onclick="clearConsole(4)" class="text-[10px] text-slate-400 hover:text-teal-400">Clear</button>
+                        </div>
+                    </div>
+                    <pre id="console-4" class="bg-slate-950 text-slate-300 font-mono text-xs p-3.5 rounded-b-xl border border-slate-800 h-36 overflow-y-auto terminal-scroll leading-5">Console waiting for execution...</pre>
+
+                    <!-- Execution Buttons -->
+                    <div class="mt-3.5 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="executeTask(4)" class="px-3.5 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-semibold shadow transition active:scale-95 flex items-center space-x-1.5">
+                                <span>🚀 Execute Loops</span>
+                            </button>
+                            <button onclick="viewTaskCode(4)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                View Code
+                            </button>
+                        </div>
+                        <button onclick="copyConsole(4)" class="text-xs text-slate-400 hover:text-teal-400">Copy Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 05: Functions & Scope Isolation -->
+            <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 teal-glow-hover">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-500/15 text-teal-400 border border-teal-500/30">TASK 05</span>
+                            <h2 class="text-base font-bold text-slate-100">Functions & Block Scope</h2>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">task_05_functions.js</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        Compares standard functions with arrow expressions, utilizing default parameters and verifying block scope isolation with <code class="text-teal-300">try...catch</code>.
+                    </p>
+                    <div class="flex flex-wrap gap-1.5 mb-4 text-[11px] font-mono">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">computeBoxArea(5, 4)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">arrowBoxArea(10, 3)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-rose-300 border border-slate-700">isolatedBlockToken (Catch)</span>
+                    </div>
+                </div>
+
+                <!-- Card Terminal -->
+                <div>
+                    <div class="flex items-center justify-between bg-slate-950/80 px-3.5 py-2 rounded-t-xl border border-b-0 border-slate-800 text-xs">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <span class="ml-2 font-mono text-[11px] text-slate-400">console // task_05</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="status-task-5" class="text-[10px] font-mono text-slate-500 uppercase">IDLE</span>
+                            <button onclick="clearConsole(5)" class="text-[10px] text-slate-400 hover:text-teal-400">Clear</button>
+                        </div>
+                    </div>
+                    <pre id="console-5" class="bg-slate-950 text-slate-300 font-mono text-xs p-3.5 rounded-b-xl border border-slate-800 h-36 overflow-y-auto terminal-scroll leading-5">Console waiting for execution...</pre>
+
+                    <!-- Execution Buttons -->
+                    <div class="mt-3.5 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="executeTask(5)" class="px-3.5 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-semibold shadow transition active:scale-95 flex items-center space-x-1.5">
+                                <span>🚀 Execute Functions</span>
+                            </button>
+                            <button onclick="viewTaskCode(5)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                View Code
+                            </button>
+                        </div>
+                        <button onclick="copyConsole(5)" class="text-xs text-slate-400 hover:text-teal-400">Copy Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 06: Collections & Array Higher-Order Methods -->
+            <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 teal-glow-hover">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-500/15 text-teal-400 border border-teal-500/30">TASK 06</span>
+                            <h2 class="text-base font-bold text-slate-100">Collections & Array Methods</h2>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">task_06_collections.js</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        Processes product catalog array using <code class="text-teal-300">forEach</code> iteration, applies <code class="text-teal-300">filter</code> for products &lt; 50, and maps uppercase tags with <code class="text-teal-300">map</code>.
+                    </p>
+                    <div class="flex flex-wrap gap-1.5 mb-4 text-[11px] font-mono">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">catalog ([title, cost])</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">forEach()</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-cyan-300 border border-slate-700">filter(cost &lt; 50)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-teal-300 border border-slate-700">map(toUpperCase)</span>
+                    </div>
+                </div>
+
+                <!-- Card Terminal -->
+                <div>
+                    <div class="flex items-center justify-between bg-slate-950/80 px-3.5 py-2 rounded-t-xl border border-b-0 border-slate-800 text-xs">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <span class="ml-2 font-mono text-[11px] text-slate-400">console // task_06</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="status-task-6" class="text-[10px] font-mono text-slate-500 uppercase">IDLE</span>
+                            <button onclick="clearConsole(6)" class="text-[10px] text-slate-400 hover:text-teal-400">Clear</button>
+                        </div>
+                    </div>
+                    <pre id="console-6" class="bg-slate-950 text-slate-300 font-mono text-xs p-3.5 rounded-b-xl border border-slate-800 h-36 overflow-y-auto terminal-scroll leading-5">Console waiting for execution...</pre>
+
+                    <!-- Execution Buttons -->
+                    <div class="mt-3.5 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="executeTask(6)" class="px-3.5 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-semibold shadow transition active:scale-95 flex items-center space-x-1.5">
+                                <span>🚀 Execute Methods</span>
+                            </button>
+                            <button onclick="viewTaskCode(6)" class="px-3 py-1.5 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600/60 transition">
+                                View Code
+                            </button>
+                        </div>
+                        <button onclick="copyConsole(6)" class="text-xs text-slate-400 hover:text-teal-400">Copy Log</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Featured Full-Width Card: Task 07 Capstone Inventory App -->
+        <div class="bg-gradient-to-b from-slate-800 to-slate-850 border border-teal-500/30 rounded-2xl p-6 lg:p-7 shadow-xl shadow-teal-950/30 teal-glow">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+
+                <!-- Left Column: Info & Specs -->
+                <div class="lg:w-1/2 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="px-3 py-1 rounded-md text-xs font-extrabold bg-teal-500 text-slate-950 tracking-wider shadow">CAPSTONE</span>
+                        <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-500/15 text-teal-400 border border-teal-500/30">TASK 07</span>
+                        <h2 class="text-xl font-bold text-slate-50">Enterprise Inventory Dashboard & Analytics</h2>
+                    </div>
+
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Comprehensive integration combining default seeds (<code class="text-teal-300">Laptop $800</code>, <code class="text-teal-300">Mouse $25</code>), dynamic prompt injection (<code class="text-teal-300">Monitor $150</code> default), tier classification (<span class="text-emerald-400">Premium &ge; 500</span>, <span class="text-cyan-400">Standard &ge; 100</span>, <span class="text-amber-400">Budget &lt; 100</span>), total portfolio valuation via <code class="text-teal-300">reduce</code>, and formatted uppercase reporting.
+                    </p>
+
+                    <!-- Realtime Capstone Analytics Indicators -->
+                    <div class="grid grid-cols-3 gap-3 pt-2">
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-center">
+                            <div class="text-[11px] font-medium text-slate-400 uppercase">Portfolio Value</div>
+                            <div id="capstone-val" class="text-lg font-black text-teal-400 mt-0.5">$975</div>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-center">
+                            <div class="text-[11px] font-medium text-slate-400 uppercase">Affordable Items</div>
+                            <div id="capstone-count" class="text-lg font-black text-cyan-400 mt-0.5">2 Items</div>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-center">
+                            <div class="text-[11px] font-medium text-slate-400 uppercase">Tier System</div>
+                            <div class="text-xs font-bold text-emerald-400 mt-1.5">3 Tiers Active</div>
+                        </div>
+                    </div>
+
+                    <!-- Action Triggers -->
+                    <div class="pt-2 flex flex-wrap items-center gap-3">
+                        <button onclick="executeTaskWithPrompt(7)" class="px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 text-sm font-bold shadow-lg shadow-teal-500/20 transition-all active:scale-95 flex items-center space-x-2">
+                            <span>💬 Prompt Dynamic Item & Run</span>
+                        </button>
+                        <button onclick="executeTask(7)" class="px-3.5 py-2 rounded-xl bg-slate-700/80 hover:bg-slate-700 text-slate-200 text-sm font-semibold border border-slate-600 transition">
+                            Default ('Monitor' @ $150)
+                        </button>
+                        <button onclick="viewTaskCode(7)" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium border border-slate-700 transition">
+                            View Source
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Terminal -->
+                <div class="lg:w-1/2">
+                    <div class="flex items-center justify-between bg-slate-950/90 px-4 py-2.5 rounded-t-xl border border-b-0 border-slate-800 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+                            <span class="ml-2 font-mono text-xs text-teal-400 font-semibold">capstone_inventory_app.log</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span id="status-task-7" class="text-xs font-mono text-slate-500 uppercase">IDLE</span>
+                            <button onclick="clearConsole(7)" class="text-xs text-slate-400 hover:text-teal-400">Clear</button>
+                            <button onclick="copyConsole(7)" class="text-xs text-slate-400 hover:text-teal-400">Copy</button>
+                        </div>
+                    </div>
+                    <pre id="console-7" class="bg-slate-950 text-slate-200 font-mono text-xs p-4 rounded-b-xl border border-slate-800 h-64 overflow-y-auto terminal-scroll leading-6">Capstone terminal ready. Click "Prompt Dynamic Item & Run" to execute...</pre>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Master Consolidated Console Drawer -->
+        <div class="bg-slate-850 border border-slate-800 rounded-2xl p-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></div>
+                    <h3 class="text-sm font-bold text-slate-200 tracking-wide uppercase">Unified Master Activity Log</h3>
+                    <span class="text-xs text-slate-400">(Aggregated real-time stream of all script invocations)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="clearMasterLog()" class="px-2.5 py-1 text-xs text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 transition">
+                        Clear Master Stream
+                    </button>
+                    <button onclick="copyMasterLogs()" class="px-2.5 py-1 text-xs text-teal-400 hover:text-teal-300 bg-teal-500/10 hover:bg-teal-500/20 rounded border border-teal-500/30 transition">
+                        Copy Complete Log
+                    </button>
+                </div>
+            </div>
+            <pre id="console-master" class="bg-slate-950 text-slate-300 font-mono text-xs p-4 rounded-xl border border-slate-800 h-52 overflow-y-auto terminal-scroll leading-5">Unified master console initialized. Execute any task above to stream formatted visual logs.</pre>
+        </div>
+
+    </main>
+
+    <!-- Source Code Viewer Modal -->
+    <div id="code-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <span id="modal-task-badge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30">TASK 01</span>
+                    <h3 id="modal-task-title" class="text-base font-bold text-slate-100">task_01_types.js</h3>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="copyModalCode()" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-teal-400 border border-slate-700 transition">Copy Code</button>
+                    <button onclick="closeCodeModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-100 flex items-center justify-center transition">✕</button>
+                </div>
+            </div>
+            <div class="p-5 flex-grow overflow-y-auto terminal-scroll bg-slate-950">
+                <pre id="modal-code-content" class="text-xs font-mono text-slate-300 leading-relaxed"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Element -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-teal-500 text-slate-950 font-semibold px-4 py-2.5 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 text-xs flex items-center space-x-2 pointer-events-none">
+        <span id="toast-icon">✓</span>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <!-- Scripts Inclusion for In-Browser Execution -->
+    <script src="task_01_types.js"></script>
+    <script src="task_02_billing.js"></script>
+    <script src="task_03_evaluator.js"></script>
+    <script src="task_04_iterations.js"></script>
+    <script src="task_05_functions.js"></script>
+    <script src="task_06_collections.js"></script>
+    <script src="task_07_inventory_app.js"></script>
+
+    <!-- UI Controller & Orchestration Logic -->
+    <script>
+        let totalExecutions = 0;
+        const taskFileNames = {
+            1: "task_01_types.js",
+            2: "task_02_billing.js",
+            3: "task_03_evaluator.js",
+            4: "task_04_iterations.js",
+            5: "task_05_functions.js",
+            6: "task_06_collections.js",
+            7: "task_07_inventory_app.js"
+        };
+
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById("toast");
+            const msgEl = document.getElementById("toast-message");
+            const iconEl = document.getElementById("toast-icon");
+            msgEl.textContent = message;
+            iconEl.textContent = isSuccess ? "✓" : "ℹ";
+            toast.classList.remove("translate-y-20", "opacity-0");
+            setTimeout(() => {
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 2500);
+        }
+
+        function createLogger(taskId) {
+            const cardConsole = document.getElementById(`console-${taskId}`);
+            const masterConsole = document.getElementById("console-master");
+            const statusEl = document.getElementById(`status-task-${taskId}`);
+
+            // Clear placeholder if first log
+            if (cardConsole.textContent.startsWith("Console waiting") || cardConsole.textContent.startsWith("Capstone terminal ready")) {
+                cardConsole.textContent = "";
+            }
+            if (masterConsole.textContent.startsWith("Unified master console initialized")) {
+                masterConsole.textContent = "";
+            }
+
+            statusEl.textContent = "RUNNING";
+            statusEl.className = "text-[10px] font-mono text-teal-400 uppercase animate-pulse";
+
+            return function customLog(...args) {
+                const timestamp = new Date().toLocaleTimeString();
+                const formattedArgs = args.map(arg => {
+                    if (typeof arg === "object" && arg !== null) {
+                        return JSON.stringify(arg, null, 2);
+                    }
+                    return String(arg);
+                }).join(" ");
+
+                // Append to individual card console
+                cardConsole.textContent += formattedArgs + "\n";
+                cardConsole.scrollTop = cardConsole.scrollHeight;
+
+                // Append to master console
+                masterConsole.textContent += `[${timestamp}] [TASK ${taskId.toString().padStart(2, '0')}]: ${formattedArgs}\n`;
+                masterConsole.scrollTop = masterConsole.scrollHeight;
+            };
+        }
+
+        function finishTask(taskId) {
+            const statusEl = document.getElementById(`status-task-${taskId}`);
+            statusEl.textContent = "COMPLETED";
+            statusEl.className = "text-[10px] font-mono text-emerald-400 uppercase font-bold";
+            totalExecutions++;
+            document.getElementById("stat-run-count").textContent = totalExecutions;
+            document.getElementById("stat-run-label").textContent = `${totalExecutions} executions`;
+        }
+
+        function executeTask(taskId) {
+            const logger = createLogger(taskId);
+            try {
+                switch(taskId) {
+                    case 1:
+                        if (typeof runTask01 === "function") runTask01(logger);
+                        break;
+                    case 2:
+                        if (typeof runTask02 === "function") runTask02("100", "15", logger);
+                        break;
+                    case 3:
+                        if (typeof runTask03 === "function") runTask03(85, logger);
+                        break;
+                    case 4:
+                        if (typeof runTask04 === "function") runTask04(logger);
+                        break;
+                    case 5:
+                        if (typeof runTask05 === "function") runTask05(logger);
+                        break;
+                    case 6:
+                        if (typeof runTask06 === "function") runTask06(logger);
+                        break;
+                    case 7:
+                        if (typeof runTask07 === "function") {
+                            const res = runTask07("Monitor", 150, logger);
+                            if (res) {
+                                document.getElementById("capstone-val").textContent = `$${res.totalInventoryValue}`;
+                                document.getElementById("capstone-count").textContent = `${res.filteredAffordable.length} Items`;
+                            }
+                        }
+                        break;
+                }
+                finishTask(taskId);
+                showToast(`Task 0${taskId} executed successfully!`);
+            } catch (err) {
+                logger(`Runtime Error: ${err.message}`);
+                const statusEl = document.getElementById(`status-task-${taskId}`);
+                statusEl.textContent = "ERROR";
+                statusEl.className = "text-[10px] font-mono text-rose-400 uppercase font-bold";
+            }
+        }
+
+        function executeTaskWithPrompt(taskId) {
+            const logger = createLogger(taskId);
+            try {
+                switch(taskId) {
+                    case 2:
+                        if (typeof runTask02 === "function") {
+                            runTask02(undefined, undefined, logger);
+                        }
+                        break;
+                    case 3:
+                        if (typeof runTask03 === "function") {
+                            runTask03(undefined, logger);
+                        }
+                        break;
+                    case 7:
+                        if (typeof runTask07 === "function") {
+                            const res = runTask07(undefined, undefined, logger);
+                            if (res) {
+                                document.getElementById("capstone-val").textContent = `$${res.totalInventoryValue}`;
+                                document.getElementById("capstone-count").textContent = `${res.filteredAffordable.length} Items`;
+                            }
+                        }
+                        break;
+                    default:
+                        executeTask(taskId);
+                        return;
+                }
+                finishTask(taskId);
+                showToast(`Task 0${taskId} interactive run complete!`);
+            } catch (err) {
+                logger(`Prompt / Execution Error: ${err.message}`);
+                const statusEl = document.getElementById(`status-task-${taskId}`);
+                statusEl.textContent = "ERROR";
+                statusEl.className = "text-[10px] font-mono text-rose-400 uppercase font-bold";
+            }
+        }
+
+        async function executeAllTasks() {
+            clearAllConsoles();
+            showToast("Sequencing execution of all 7 modules...");
+            for (let i = 1; i <= 7; i++) {
+                executeTask(i);
+                await new Promise(resolve => setTimeout(resolve, 150));
+            }
+            showToast("All 7 modules completed successfully!");
+        }
+
+        function clearConsole(taskId) {
+            document.getElementById(`console-${taskId}`).textContent = "Console cleared. Ready for next execution.\n";
+            const statusEl = document.getElementById(`status-task-${taskId}`);
+            statusEl.textContent = "IDLE";
+            statusEl.className = "text-[10px] font-mono text-slate-500 uppercase";
+        }
+
+        function clearAllConsoles() {
+            for (let i = 1; i <= 7; i++) {
+                clearConsole(i);
+            }
+            clearMasterLog();
+            showToast("All task consoles cleared.");
+        }
+
+        function clearMasterLog() {
+            document.getElementById("console-master").textContent = "Master log cleared.\n";
+        }
+
+        function copyConsole(taskId) {
+            const text = document.getElementById(`console-${taskId}`).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`Task 0${taskId} log copied to clipboard!`);
+            });
+        }
+
+        function copyMasterLogs() {
+            const text = document.getElementById("console-master").textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Consolidated master log copied to clipboard!");
+            });
+        }
+
+        function exportLogsToFile() {
+            const text = document.getElementById("console-master").textContent;
+            const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `javascript_assignment_execution_logs_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Logs exported as text file!");
+        }
+
+        // View Code Modal Handler
+        async function viewTaskCode(taskId) {
+            const fileName = taskFileNames[taskId];
+            document.getElementById("modal-task-badge").textContent = `TASK 0${taskId}`;
+            document.getElementById("modal-task-title").textContent = fileName;
+            const codeEl = document.getElementById("modal-code-content");
+            codeEl.textContent = "Loading source code...";
+
+            try {
+                const response = await fetch(fileName);
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                const code = await response.text();
+                codeEl.textContent = code;
+            } catch (err) {
+                // If opened as local file:// and fetch is restricted, inspect window function string
+                let fallback = "";
+                switch(taskId) {
+                    case 1: fallback = window.runTask01 ? window.runTask01.toString() : ""; break;
+                    case 2: fallback = window.runTask02 ? window.runTask02.toString() : ""; break;
+                    case 3: fallback = window.runTask03 ? window.runTask03.toString() : ""; break;
+                    case 4: fallback = window.runTask04 ? window.runTask04.toString() : ""; break;
+                    case 5: fallback = window.runTask05 ? window.runTask05.toString() : ""; break;
+                    case 6: fallback = window.runTask06 ? window.runTask06.toString() : ""; break;
+                    case 7: fallback = window.runTask07 ? window.runTask07.toString() : ""; break;
+                }
+                codeEl.textContent = fallback || `// View file directly at ${fileName}\n// Local browser security (CORS) restricted direct fetch for file:// protocol.`;
+            }
+
+            document.getElementById("code-modal").classList.remove("hidden");
+        }
+
+        function closeCodeModal() {
+            document.getElementById("code-modal").classList.add("hidden");
+        }
+
+        function copyModalCode() {
+            const code = document.getElementById("modal-code-content").textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast("Source code copied to clipboard!");
+            });
+        }
+    </script>
+</body>
+</html>
